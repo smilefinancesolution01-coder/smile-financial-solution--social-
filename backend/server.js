@@ -5,10 +5,15 @@ dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log("==================================");
-  console.log("🚀 Smile AI Marketing OS Backend");
-  console.log(`✅ Server Running on Port ${PORT}`);
-  console.log(`🌐 http://localhost:${PORT}`);
-  console.log("==================================");
-});
+if (process.env.VERCEL) {
+  console.log("Running on Vercel");
+} else {
+  app.listen(PORT, () => {
+    console.log("==================================");
+    console.log("🚀 Smile AI Marketing OS Backend");
+    console.log(`Server Running on Port ${PORT}`);
+    console.log("==================================");
+  });
+}
+
+export default app;
