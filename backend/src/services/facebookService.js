@@ -1,86 +1,25 @@
-import { graphRequest, PAGE_ID } from "../config/facebook.js";
+import {
+  facebookApi,
+  FACEBOOK_PAGE_ID,
+  FACEBOOK_PAGE_ACCESS_TOKEN,
+  validateFacebookConfig
+} from "../config/facebook.js";
 
 class FacebookService {
-  // Get Page Information
-  async getPageInfo() {
-    try {
-      const data = await graphRequest(
-        "GET",
-        `/${PAGE_ID}`,
-        {
-          fields: "id,name,followers_count,fan_count"
-        }
-      );
-
-      return {
-        success: true,
-        data
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message
-      };
-    }
-  }
-
-  // Create Text Post
-  async createPost(message) {
-    try {
-      const data = await graphRequest(
-        "POST",
-        `/${PAGE_ID}/feed`,
-        {
-          message
-        }
-      );
-
-      return {
-        success: true,
-        postId: data.id,
-        data
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message
-      };
-    }
-  }
-
-  // Create Image Post
-  async createPhotoPost(message, imageUrl) {
-    try {
-      const data = await graphRequest(
-        "POST",
-        `/${PAGE_ID}/photos`,
-        {
-          caption: message,
-          url: imageUrl
-        }
-      );
-
-      return {
-        success: true,
-        photoId: data.id,
-        data
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message
-      };
-    }
+  constructor() {
+    validateFacebookConfig();
   }
 
   // Health Check
-  async healthCheck() {
+  async health() {
     try {
-      const data = await graphRequest(
-        "GET",
-        `/${PAGE_ID}`,
+      const { data } = await facebookApi.get(
+        `/${FACEBOOK_PAGE_ID}`,
         {
-          fields: "id,name"
+          params: {
+            fields: "id,name",
+            access_token: FACEBOOK_PAGE_ACCESS_TOKEN
+          }
         }
       );
 
@@ -90,12 +29,117 @@ class FacebookService {
         page: data
       };
     } catch (error) {
-      return {
-        success: false,
-        status: "Facebook API Error",
-        message: error.message
-      };
+      throw this.handleError(error);
     }
+  }
+
+  // Get Page Information
+  async getPage() {
+    try {
+      const { data } = await facebookApi.get(
+        `/${FACEBOOK_PAGE_ID}`,
+        {
+          params: {
+            fields:
+              "id,name,followers_count,fan_count,picture",
+            access_token: FACEBOOK_PAGE_ACCESS_TOKEN
+          }
+        }
+      );
+
+      return data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
+  // Get Latest Posts
+  async getPosts(limit = 10) {
+    try {
+      const { data } = await facebookApi.get(
+        `/${FACEBOOK_PAGE_ID}/posts`,
+        {
+          params: {
+            limit,
+            access_token: FACEBOOK_PAGE_ACCESS_TOKEN
+          }
+        }
+      );
+
+      return data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
+  // Publish Text Post
+  async createPost(message) {
+    try {
+      const { data } = await facebookApi.post(
+        `/${FACEBOOK_PAGE_ID}/feed`,
+        null,
+        {
+          params: {
+            message,
+            access_token: FACEBOOK_PAGE_ACCESS_TOKEN
+          }
+        }
+      );
+
+      return data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
+  // Publish Image
+  async createPhoto(imageUrl, caption = "") {
+    try {
+      const { data } = await facebookApi.post(
+        `/${FACEBOOK_PAGE_ID}/photos`,
+        null,
+        {
+          params: {
+            url: imageUrl,
+            caption,
+            access_token: FACEBOOK_PAGE_ACCESS_TOKEN
+          }
+        }
+      );
+
+      return data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
+  // Delete Post
+  async deletePost(postId) {
+    try {
+      const { data } = await facebookApi.delete(
+        `/${postId}`,
+        {
+          params: {
+            access_token: FACEBOOK_PAGE_ACCESS_TOKEN
+          }
+        }
+      );
+
+      return data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
+  // Error Handler
+  handleError(error) {
+    if (error.response) {
+      return new Error(
+        JSON.stringify(error.response.data)
+      );
+    }
+
+    return new Error(error.message);
   }
 }
 
