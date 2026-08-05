@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
+import app from "../src/app.js";
 
 import facebookRoutes from "../src/routes/facebookRoutes.js";
 
