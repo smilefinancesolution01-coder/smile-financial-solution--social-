@@ -1,24 +1,56 @@
 import express from "express";
 
 import {
-  getPageInfo,
+  health,
+  getPage,
+  getPosts,
   createPost,
-  createPhotoPost,
-  healthCheck,
+  createPhoto,
+  deletePost
 } from "../controllers/facebookController.js";
 
 const router = express.Router();
 
-// Health Check
-router.get("/health", healthCheck);
+/*
+|--------------------------------------------------------------------------
+| Health Check
+|--------------------------------------------------------------------------
+*/
+router.get("/health", health);
 
-// Page Information
-router.get("/page", getPageInfo);
+/*
+|--------------------------------------------------------------------------
+| Page Information
+|--------------------------------------------------------------------------
+*/
+router.get("/page", getPage);
 
-// Create Text Post
+/*
+|--------------------------------------------------------------------------
+| Page Posts
+|--------------------------------------------------------------------------
+*/
+router.get("/posts", getPosts);
+
+/*
+|--------------------------------------------------------------------------
+| Publish Text Post
+|--------------------------------------------------------------------------
+*/
 router.post("/post", createPost);
 
-// Create Photo Post
-router.post("/photo", createPhotoPost);
+/*
+|--------------------------------------------------------------------------
+| Publish Photo
+|--------------------------------------------------------------------------
+*/
+router.post("/photo", createPhoto);
+
+/*
+|--------------------------------------------------------------------------
+| Delete Post
+|--------------------------------------------------------------------------
+*/
+router.delete("/post/:postId", deletePost);
 
 export default router;
