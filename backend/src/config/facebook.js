@@ -1,38 +1,35 @@
-import axios from "axios";
 import dotenv from "dotenv";
+import axios from "axios";
 
 dotenv.config();
 
-const PAGE_ID = process.env.FACEBOOK_PAGE_ID;
-const PAGE_ACCESS_TOKEN = process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
-const API_VERSION = process.env.FACEBOOK_API_VERSION || "v25.0";
+export const FACEBOOK_API_VERSION =
+  process.env.FACEBOOK_API_VERSION || "v25.0";
 
-const graph = axios.create({
-  baseURL: `https://graph.facebook.com/${API_VERSION}`,
-  timeout: 30000,
+export const FACEBOOK_PAGE_ID =
+  process.env.FACEBOOK_PAGE_ID;
+
+export const FACEBOOK_PAGE_ACCESS_TOKEN =
+  process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
+
+export const GRAPH_API_URL =
+  `https://graph.facebook.com/${FACEBOOK_API_VERSION}`;
+
+// Axios instance
+export const facebookApi = axios.create({
+  baseURL: GRAPH_API_URL,
+  timeout: 30000
 });
 
-export async function graphRequest(method, endpoint, data = {}) {
-  try {
-    const response = await graph({
-      method,
-      url: endpoint,
-      params: {
-        access_token: PAGE_ACCESS_TOKEN,
-        ...data,
-      },
-    });
-
-    return response.data;
-  } catch (error) {
-    if (error.response) {
-      throw new Error(
-        JSON.stringify(error.response.data)
-      );
-    }
-
-    throw error;
+// Check Environment Variables
+export function validateFacebookConfig() {
+  if (!FACEBOOK_PAGE_ID) {
+    throw new Error("FACEBOOK_PAGE_ID is missing in .env");
   }
-}
 
-export { PAGE_ID };
+  if (!FACEBOOK_PAGE_ACCESS_TOKEN) {
+    throw new Error("FACEBOOK_PAGE_ACCESS_TOKEN is missing in .env");
+  }
+
+  return true;
+}
