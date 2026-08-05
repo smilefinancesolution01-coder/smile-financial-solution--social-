@@ -10,7 +10,9 @@ class FacebookService {
     validateFacebookConfig();
   }
 
+  // ============================
   // Health Check
+  // ============================
   async health() {
     try {
       const response = await facebookApi.get(`/${FACEBOOK_PAGE_ID}`, {
@@ -30,7 +32,9 @@ class FacebookService {
     }
   }
 
-  // Page Details
+  // ============================
+  // Get Page Information
+  // ============================
   async getPage() {
     try {
       const response = await facebookApi.get(`/${FACEBOOK_PAGE_ID}`, {
@@ -46,15 +50,20 @@ class FacebookService {
     }
   }
 
-  // Latest Posts
+  // ============================
+  // Get Latest Posts
+  // ============================
   async getPosts(limit = 10) {
     try {
-      const response = await facebookApi.get(`/${FACEBOOK_PAGE_ID}/posts`, {
-        params: {
-          limit,
-          access_token: FACEBOOK_PAGE_ACCESS_TOKEN
+      const response = await facebookApi.get(
+        `/${FACEBOOK_PAGE_ID}/posts`,
+        {
+          params: {
+            limit,
+            access_token: FACEBOOK_PAGE_ACCESS_TOKEN
+          }
         }
-      });
+      );
 
       return response.data;
     } catch (error) {
@@ -62,7 +71,9 @@ class FacebookService {
     }
   }
 
+  // ============================
   // Publish Text Post
+  // ============================
   async createPost(message) {
     try {
       if (!message) {
@@ -86,7 +97,9 @@ class FacebookService {
     }
   }
 
-  // Publish Image
+  // ============================
+  // Publish Image by URL
+  // ============================
   async createPhoto(imageUrl, caption = "") {
     try {
       if (!imageUrl) {
@@ -111,9 +124,15 @@ class FacebookService {
     }
   }
 
-  // Delete Post
+  // ============================
+  // Delete Facebook Post
+  // ============================
   async deletePost(postId) {
     try {
+      if (!postId) {
+        throw new Error("Post ID is required.");
+      }
+
       const response = await facebookApi.delete(`/${postId}`, {
         params: {
           access_token: FACEBOOK_PAGE_ACCESS_TOKEN
@@ -126,17 +145,30 @@ class FacebookService {
     }
   }
 
+  // ============================
+  // Schedule Post (Future)
+  // ============================
+  async schedulePost() {
+    throw new Error("Schedule Post feature is coming soon.");
+  }
+
+  // ============================
   // Error Formatter
+  // ============================
   formatError(error) {
     if (error.response?.data) {
       return new Error(JSON.stringify(error.response.data));
     }
 
     if (error.request) {
-      return new Error("No response received from Facebook Graph API.");
+      return new Error(
+        "No response received from Facebook Graph API."
+      );
     }
 
-    return new Error(error.message || "Unknown Facebook API Error");
+    return new Error(
+      error.message || "Unknown Facebook API Error"
+    );
   }
 }
 
