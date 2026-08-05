@@ -2,21 +2,13 @@
   "name": "smile-ai-marketing-os-backend",
   "version": "1.0.0",
   "description": "Smile AI Marketing OS Backend",
+  "private": true,
   "type": "module",
-  "main": "server.js",
+  "main": "api/index.js",
   "scripts": {
-    "dev": "nodemon server.js",
-    "start": "node server.js"
+    "dev": "nodemon api/index.js",
+    "start": "node api/index.js"
   },
-  "keywords": [
-    "facebook",
-    "graph-api",
-    "express",
-    "marketing",
-    "smile-ai"
-  ],
-  "author": "Smile Financial Solution",
-  "license": "MIT",
   "engines": {
     "node": "20.x"
   },
