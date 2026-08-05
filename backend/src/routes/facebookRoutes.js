@@ -6,16 +6,15 @@ import {
   getPosts,
   createPost,
   createPhoto,
-  deletePost
+  deletePost,
+  testPost
 } from "../controllers/facebookController.js";
-
-import facebookService from "../services/facebookService.js";
 
 const router = express.Router();
 
 /*
 |--------------------------------------------------------------------------
-| Health Check
+| Health
 |--------------------------------------------------------------------------
 */
 router.get("/health", health);
@@ -57,27 +56,9 @@ router.delete("/post/:postId", deletePost);
 
 /*
 |--------------------------------------------------------------------------
-| Temporary Test Route
-| (Browser se live Facebook post test karne ke liye)
+| Browser Test Route
 |--------------------------------------------------------------------------
 */
-router.get("/test-post", async (req, res) => {
-  try {
-    const result = await facebookService.createPost(
-      "🚀 Hello Facebook!\n\nThis is my first automated test post from Smile AI Marketing OS."
-    );
-
-    res.status(200).json({
-      success: true,
-      message: "Post published successfully.",
-      data: result
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
-  }
-});
+router.get("/test-post", testPost);
 
 export default router;
