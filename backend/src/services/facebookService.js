@@ -13,69 +13,63 @@ class FacebookService {
   // Health Check
   async health() {
     try {
-      const { data } = await facebookApi.get(
-        `/${FACEBOOK_PAGE_ID}`,
-        {
-          params: {
-            fields: "id,name",
-            access_token: FACEBOOK_PAGE_ACCESS_TOKEN
-          }
+      const response = await facebookApi.get(`/${FACEBOOK_PAGE_ID}`, {
+        params: {
+          fields: "id,name",
+          access_token: FACEBOOK_PAGE_ACCESS_TOKEN
         }
-      );
+      });
 
       return {
         success: true,
         status: "Facebook API Connected",
-        page: data
+        page: response.data
       };
     } catch (error) {
-      throw this.handleError(error);
+      throw this.formatError(error);
     }
   }
 
-  // Get Page Information
+  // Page Details
   async getPage() {
     try {
-      const { data } = await facebookApi.get(
-        `/${FACEBOOK_PAGE_ID}`,
-        {
-          params: {
-            fields:
-              "id,name,followers_count,fan_count,picture",
-            access_token: FACEBOOK_PAGE_ACCESS_TOKEN
-          }
+      const response = await facebookApi.get(`/${FACEBOOK_PAGE_ID}`, {
+        params: {
+          fields: "id,name,followers_count,fan_count,picture",
+          access_token: FACEBOOK_PAGE_ACCESS_TOKEN
         }
-      );
+      });
 
-      return data;
+      return response.data;
     } catch (error) {
-      throw this.handleError(error);
+      throw this.formatError(error);
     }
   }
 
-  // Get Latest Posts
+  // Latest Posts
   async getPosts(limit = 10) {
     try {
-      const { data } = await facebookApi.get(
-        `/${FACEBOOK_PAGE_ID}/posts`,
-        {
-          params: {
-            limit,
-            access_token: FACEBOOK_PAGE_ACCESS_TOKEN
-          }
+      const response = await facebookApi.get(`/${FACEBOOK_PAGE_ID}/posts`, {
+        params: {
+          limit,
+          access_token: FACEBOOK_PAGE_ACCESS_TOKEN
         }
-      );
+      });
 
-      return data;
+      return response.data;
     } catch (error) {
-      throw this.handleError(error);
+      throw this.formatError(error);
     }
   }
 
   // Publish Text Post
   async createPost(message) {
     try {
-      const { data } = await facebookApi.post(
+      if (!message) {
+        throw new Error("Message is required.");
+      }
+
+      const response = await facebookApi.post(
         `/${FACEBOOK_PAGE_ID}/feed`,
         null,
         {
@@ -86,16 +80,20 @@ class FacebookService {
         }
       );
 
-      return data;
+      return response.data;
     } catch (error) {
-      throw this.handleError(error);
+      throw this.formatError(error);
     }
   }
 
   // Publish Image
   async createPhoto(imageUrl, caption = "") {
     try {
-      const { data } = await facebookApi.post(
+      if (!imageUrl) {
+        throw new Error("Image URL is required.");
+      }
+
+      const response = await facebookApi.post(
         `/${FACEBOOK_PAGE_ID}/photos`,
         null,
         {
@@ -107,40 +105,41 @@ class FacebookService {
         }
       );
 
-      return data;
+      return response.data;
     } catch (error) {
-      throw this.handleError(error);
+      throw this.formatError(error);
     }
   }
 
   // Delete Post
   async deletePost(postId) {
     try {
-      const { data } = await facebookApi.delete(
-        `/${postId}`,
-        {
-          params: {
-            access_token: FACEBOOK_PAGE_ACCESS_TOKEN
-          }
+      const response = await facebookApi.delete(`/${postId}`, {
+        params: {
+          access_token: FACEBOOK_PAGE_ACCESS_TOKEN
         }
-      );
+      });
 
-      return data;
+      return response.data;
     } catch (error) {
-      throw this.handleError(error);
+      throw this.formatError(error);
     }
   }
 
-  // Error Handler
-  handleError(error) {
-    if (error.response) {
-      return new Error(
-        JSON.stringify(error.response.data)
-      );
+  // Error Formatter
+  formatError(error) {
+    if (error.response?.data) {
+      return new Error(JSON.stringify(error.response.data));
     }
 
-    return new Error(error.message);
+    if (error.request) {
+      return new Error("No response received from Facebook Graph API.");
+    }
+
+    return new Error(error.message || "Unknown Facebook API Error");
   }
 }
 
-export default new FacebookService();
+const facebookService = new FacebookService();
+
+export default facebookService;
