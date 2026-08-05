@@ -1,6 +1,8 @@
 import facebookService from "../services/facebookService.js";
 
+// ==============================
 // Health Check
+// ==============================
 export const health = async (req, res) => {
   try {
     const result = await facebookService.health();
@@ -15,7 +17,9 @@ export const health = async (req, res) => {
   }
 };
 
+// ==============================
 // Get Page Information
+// ==============================
 export const getPage = async (req, res) => {
   try {
     const result = await facebookService.getPage();
@@ -32,10 +36,12 @@ export const getPage = async (req, res) => {
   }
 };
 
+// ==============================
 // Get Latest Posts
+// ==============================
 export const getPosts = async (req, res) => {
   try {
-    const limit = req.query.limit || 10;
+    const limit = Number(req.query.limit || 10);
 
     const result = await facebookService.getPosts(limit);
 
@@ -51,12 +57,14 @@ export const getPosts = async (req, res) => {
   }
 };
 
+// ==============================
 // Publish Text Post
+// ==============================
 export const createPost = async (req, res) => {
   try {
     const { message } = req.body;
 
-    if (!message) {
+    if (!message || message.trim() === "") {
       return res.status(400).json({
         success: false,
         message: "Message is required."
@@ -67,7 +75,7 @@ export const createPost = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Post published successfully.",
+      message: "Facebook post published successfully.",
       data: result
     });
   } catch (error) {
@@ -78,12 +86,14 @@ export const createPost = async (req, res) => {
   }
 };
 
-// Publish Photo
+// ==============================
+// Publish Image
+// ==============================
 export const createPhoto = async (req, res) => {
   try {
     const { imageUrl, caption } = req.body;
 
-    if (!imageUrl) {
+    if (!imageUrl || imageUrl.trim() === "") {
       return res.status(400).json({
         success: false,
         message: "Image URL is required."
@@ -92,12 +102,12 @@ export const createPhoto = async (req, res) => {
 
     const result = await facebookService.createPhoto(
       imageUrl,
-      caption
+      caption || ""
     );
 
     res.status(201).json({
       success: true,
-      message: "Photo published successfully.",
+      message: "Facebook image published successfully.",
       data: result
     });
   } catch (error) {
@@ -108,7 +118,9 @@ export const createPhoto = async (req, res) => {
   }
 };
 
+// ==============================
 // Delete Post
+// ==============================
 export const deletePost = async (req, res) => {
   try {
     const { postId } = req.params;
@@ -124,7 +136,29 @@ export const deletePost = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Post deleted successfully.",
+      message: "Facebook post deleted successfully.",
+      data: result
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// ==============================
+// Browser Test Route
+// ==============================
+export const testPost = async (req, res) => {
+  try {
+    const result = await facebookService.createPost(
+      "🚀 Test Post from Smile AI Marketing OS\n\nFacebook Integration Working Successfully."
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Test post published successfully.",
       data: result
     });
   } catch (error) {
